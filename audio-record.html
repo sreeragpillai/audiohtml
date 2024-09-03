@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <title>Conversation Summarizer</title>
+
+  <style>
+
+    body {
+
+      font-family: Arial, sans-serif;
+
+    }
+
+    #conversation-block {
+
+      width: 500px;
+
+      height: 200px;
+
+      border: 1px solid #ccc;
+
+      padding: 10px;
+
+      overflow-y: auto;
+
+    }
+
+    #summarized-output {
+
+      width: 500px;
+
+      height: 100px;
+
+      border: 1px solid #ccc;
+
+      padding: 10px;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <h1>Conversation Summarizer</h1>
+
+  <button id="microphone-button">Start Recording</button>
+
+  <div id="conversation-block"></div>
+
+  <button id="submit-button">Summarize Conversation</button>
+
+  <div id="summarized-output"></div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/web-audio-api@0.2.3/dist/web-audio-api.min.js"></script>
+
+  <script>
+
+    const microphoneButton = document.getElementById('microphone-button');
+
+    const conversationBlock = document.getElementById('conversation-block');
+
+    const submitButton = document.getElementById('submit-button');
+
+    const summarizedOutput = document.getElementById('summarized-output');
+
+
+    let audioContext;
+
+    let source;
+
+    let gain;
+
+    let audioData = [];
+
+
+    microphoneButton.addEventListener('click', async () => {
+
+      audioContext = new AudioContext();
+
+      source = audioContext.createMediaStreamSource(stream);
+
+      gain = audioContext.createGain();
+
+      source.connect(gain);
+
+      gain.connect(audioContext.destination);
+
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      const audioTracks = stream.getAudioTracks();
+
+
+      audioTracks.forEach(track => {
+
+        track.addEventListener('dataavailable', event => {
+
+          audioData.push(event.data);
+
+        });
+
+      });
+
+
+      microphoneButton.textContent = 'Stop Recording';
+
+      microphoneButton.disabled = true;
+
+    });
+
+
+    submitButton.addEventListener('click', () => {
+
+      const conversationText = audioData.map(data => {
+
+        return new TextDecoder('utf-8').decode(data);
+
+      }).join('');
+
+
+      conversationBlock.textContent = conversationText;
+
+
+      // TO DO: implement summarization logic here
+
+      const summarizedText = summarizeConversation(conversationText);
+
+      summarizedOutput.textContent = summarizedText;
+
+    });
+
+
+    function summarizeConversation(conversationText) {
+
+      // TO DO: implement summarization logic here
+
+      return conversationText.substring(0, 100) + '...';
+
+    }
+
+  </script>
+
+</body>
+
+</html>
